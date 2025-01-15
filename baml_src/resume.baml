@@ -1,20 +1,29 @@
 // Defining a data model.
 class Resume {
-  name string
+  name string[]
   email string
-  experience string[]
+  experience Experience[]
   skills string[]
 }
 
-// Create a function to extract the resume from a string.
-function ExtractResume(resume: string) -> Resume {
-  // Specify a client as provider/model-name
-  // you can use custom LLM params with a custom client name from clients.baml like "client CustomHaiku"
-  client "openai/gpt-4o" // Set OPENAI_API_KEY to use this client.
-  prompt #"
-    Extract from this content:
-    {{ resume }}
+class Experience {
+  company string @description(#"
+    Legal entity name (if not specified, use the generally understood company name)
+  "#)
+  title string
+}
 
+// Create a function to extract the resume from a string.
+function ExtractResume(resume: string | image) -> Resume {
+  client "openai/gpt-4o"
+  prompt #"
+    {{ _.role('user') }}
+
+    Extract from this content:
+        
+    ---------------
+    {{ resume }}
+    ---------------
     {{ ctx.output_format }}
   "#
 }
@@ -36,5 +45,14 @@ test vaibhav_resume {
       - Rust
       - C++
     "#
+  }
+}
+
+test vaibhav_resume_image {
+  functions [ExtractResume]
+  args {
+    resume {
+      file "resume.png"
+    }
   }
 }

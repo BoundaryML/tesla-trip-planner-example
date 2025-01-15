@@ -49,7 +49,7 @@ client<llm> OpenaiFallback {
   provider fallback
   options {
     // This will try the clients in order until one succeeds
-    strategy [CustomGPT4oMini, CustomGPT4oMini]
+    strategy [CustomGPT4oMini, CustomSonnet]
   }
 }
 
@@ -64,11 +64,11 @@ retry_policy Constant {
 }
 
 retry_policy Exponential {
-  max_retries 2
+  max_retries 3
   // Strategy is optional
   strategy {
     type exponential_backoff
-    delay_ms 300
+    delay_ms 400
     mutliplier 1.5
     max_delay_ms 10000
   }
